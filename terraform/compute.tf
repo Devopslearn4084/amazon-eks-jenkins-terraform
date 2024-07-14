@@ -1,4 +1,4 @@
-
+# Define AMI's data
 data "aws_ami" "amazon-linux-2" {
   most_recent = true
   owners = ["amazon"]
@@ -16,15 +16,16 @@ data "aws_ami" "amazon-linux-2" {
   }
 }
 
+# Define Resorces to create ec2 instance
 resource "aws_instance" "jenkins-instance" {
-  ami             = "${data.aws_ami.amazon-linux-2.id}"
-  instance_type   = "t2.medium"
-  key_name        = "${var.keyname}"
+  ami             = "${data.aws_ami.amazon-linux-2.id}" # here we're calling AMI's data that we defined on top 
+  instance_type   = "t2.medium" # select the instance type that number of cpu and memrory required
+  key_name        = "${var.keyname}" # passing a keyname that we defined in terraform.tfvars
   #vpc_id          = "${aws_vpc.development-vpc.id}"
-  vpc_security_group_ids = ["${aws_security_group.sg_allow_ssh_jenkins.id}"]
-  subnet_id          = "${aws_subnet.public-subnet-1.id}"
+  vpc_security_group_ids = ["${aws_security_group.sg_allow_ssh_jenkins.id}"] #Passing "aws_security_group" "sg_allow_ssh_jenkins" where we defiend below 
+  subnet_id          = "${aws_subnet.public-subnet-1.id}"  #Callimg it from network.tf / "aws_subnet" "public-subnet-1"
   #name            = "${var.name}"
-  user_data = "${file("install_jenkins.sh")}"
+  user_data = "${file("install_jenkins.sh")}" # It will configure jenkins in jenkis-instance 
 
   associate_public_ip_address = true
   tags = {
@@ -35,7 +36,7 @@ resource "aws_instance" "jenkins-instance" {
 resource "aws_security_group" "sg_allow_ssh_jenkins" {
   name        = "allow_ssh_jenkins"
   description = "Allow SSH and Jenkins inbound traffic"
-  vpc_id      = "${aws_vpc.development-vpc.id}"
+  vpc_id      = "${aws_vpc.development-vpc.id}" #defined in network.tf, terraform.tfvars, and varibles.tf
 
   ingress {
     from_port   = 22
