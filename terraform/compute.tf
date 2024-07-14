@@ -60,6 +60,7 @@ resource "aws_security_group" "sg_allow_ssh_jenkins" {
   }
 }
 
+# output of jenkins IP address
 output "jenkins_ip_address" {
   value = "${aws_instance.jenkins-instance.public_dns}"
 }
